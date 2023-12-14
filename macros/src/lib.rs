@@ -224,7 +224,7 @@ fn expand_tracing_init(attribute_args: &AttributeArgs) -> Tokens {
         .with_env_filter(#env_filter)
         .with_span_events(__internal_event_filter)
         .with_test_writer()
-        .with_ansi()
+        .with_ansi(true)
         .pretty()
         .try_init();
     }
