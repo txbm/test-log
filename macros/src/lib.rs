@@ -16,7 +16,6 @@ use syn::ItemFn;
 use syn::Lit;
 use syn::Meta;
 
-
 #[proc_macro_attribute]
 pub fn test(attr: TokenStream, item: TokenStream) -> TokenStream {
   let item = parse_macro_input!(item as ItemFn);
@@ -90,7 +89,6 @@ fn try_test(attr: TokenStream, input: ItemFn) -> syn::Result<Tokens> {
   Ok(result)
 }
 
-
 #[derive(Debug, Default)]
 struct AttributeArgs {
   default_log_filter: Option<String>,
@@ -99,7 +97,7 @@ struct AttributeArgs {
 impl AttributeArgs {
   fn try_parse_attr_single(&mut self, attr: &Attribute) -> syn::Result<bool> {
     if !attr.path().is_ident("test_log") {
-      return Ok(false)
+      return Ok(false);
     }
 
     let nested_meta = attr.parse_args_with(Meta::parse)?;
@@ -109,7 +107,7 @@ impl AttributeArgs {
       return Err(syn::Error::new_spanned(
         &nested_meta,
         "Expected NameValue syntax, e.g. 'default_log_filter = \"debug\"'.",
-      ))
+      ));
     };
 
     let ident = if let Some(ident) = name_value.path.get_ident() {
@@ -118,7 +116,7 @@ impl AttributeArgs {
       return Err(syn::Error::new_spanned(
         &name_value.path,
         "Expected NameValue syntax, e.g. 'default_log_filter = \"debug\"'.",
-      ))
+      ));
     };
 
     let arg_ref = if ident == "default_log_filter" {
@@ -127,7 +125,7 @@ impl AttributeArgs {
       return Err(syn::Error::new_spanned(
         &name_value.path,
         "Unrecognized attribute, see documentation for details.",
-      ))
+      ));
     };
 
     if let Expr::Lit(lit) = &name_value.value {
@@ -142,13 +140,12 @@ impl AttributeArgs {
       return Err(syn::Error::new_spanned(
         &name_value.value,
         "Failed to parse value, expected a string",
-      ))
+      ));
     }
 
     Ok(true)
   }
 }
-
 
 /// Expand the initialization code for the `log` crate.
 #[cfg(feature = "log")]
@@ -227,6 +224,8 @@ fn expand_tracing_init(attribute_args: &AttributeArgs) -> Tokens {
         .with_env_filter(#env_filter)
         .with_span_events(__internal_event_filter)
         .with_test_writer()
+        .with_ansi()
+        .pretty()
         .try_init();
     }
   }
